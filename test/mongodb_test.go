@@ -1,77 +1,81 @@
 package mongodb_test
 
 import (
-	"testing"
-	"newsletter-service/internal/news"
-	"time"
-	"newsletter-service/internal/db/mongodb"
 	"log"
+	"newsletter-service/internal/db/mongodb"
+	"newsletter-service/internal/news"
+	"testing"
+	"time"
+
+	"github.com/globalsign/mgo/bson"
 )
 
 var TestSession mongodb.Session
 var TestDummyNewsletters []news.Newsletter
 
-const(
-	mongodbUrl = "localhost:27017"
-	dbName = "test_newsletterdb"
+const (
+	mongodbUrl               = "localhost:27017"
+	dbName                   = "test_newsletterdb"
 	newsletterCollectionName = "test_NewsletterCollection"
 
-	testBeschreibung = "testBeschreibung"
+	testBeschreibung         = "testBeschreibung"
 	testBeschreibungEnglisch = "testBeschreibungEnglisch"
-	testPerson = "testPerson"
-	testTitel = "testTitel"
-	testTitelEnglisch = "testTitelEnglisch"
+	testPerson               = "testPerson"
+	testTitel                = "testTitel"
+	testTitelEnglisch        = "testTitelEnglisch"
 )
 
-func Setup(){
-
+func Setup() {
 	// setup dummy newsletters
 	TestDummyNewsletters = append(TestDummyNewsletters, news.Newsletter{
-		Beschreibung: testBeschreibung,
+		Id:                   bson.NewObjectId(),
+		Beschreibung:         testBeschreibung,
 		BeschreibungEnglisch: testBeschreibungEnglisch,
-		Enddatum: time.Now().AddDate(0, 0, 5),
-		Person: testPerson,
-		Startdatum: time.Now(),
-		Titel: testTitel,
-		TitelEnglisch: testTitelEnglisch,
-		Verdatum: time.Now().AddDate(0,0,6),
+		Enddatum:             time.Now().AddDate(0, 0, 5),
+		Person:               testPerson,
+		Startdatum:           time.Now(),
+		Titel:                testTitel,
+		TitelEnglisch:        testTitelEnglisch,
+		Verdatum:             time.Now().AddDate(0, 0, 6),
 	})
 
 	TestDummyNewsletters = append(TestDummyNewsletters, news.Newsletter{
-		Beschreibung: testBeschreibung + "2",
+		Id:                   bson.NewObjectId(),
+		Beschreibung:         testBeschreibung + "2",
 		BeschreibungEnglisch: testBeschreibungEnglisch + "2",
-		Enddatum: time.Now().AddDate(0, 0, 12),
-		Person: testPerson + "2",
-		Startdatum: time.Now(),
-		Titel: testTitel + "2",
-		TitelEnglisch: testTitelEnglisch + "2",
-		Verdatum: time.Now().AddDate(0,0,13),
+		Enddatum:             time.Now().AddDate(0, 0, 12),
+		Person:               testPerson + "2",
+		Startdatum:           time.Now(),
+		Titel:                testTitel + "2",
+		TitelEnglisch:        testTitelEnglisch + "2",
+		Verdatum:             time.Now().AddDate(0, 0, 13),
 	})
 
 	TestDummyNewsletters = append(TestDummyNewsletters, news.Newsletter{
-		Beschreibung: testBeschreibung,
+		Id:                   bson.NewObjectId(),
+		Beschreibung:         testBeschreibung,
 		BeschreibungEnglisch: testBeschreibungEnglisch,
-		Enddatum: time.Now().AddDate(0, 0, -5),
-		Person: testPerson,
-		Startdatum: time.Now(),
-		Titel: testTitel,
-		TitelEnglisch: testTitelEnglisch,
-		Verdatum: time.Now().AddDate(0,0,6),
+		Enddatum:             time.Now().AddDate(0, 0, -5),
+		Person:               testPerson,
+		Startdatum:           time.Now(),
+		Titel:                testTitel,
+		TitelEnglisch:        testTitelEnglisch,
+		Verdatum:             time.Now().AddDate(0, 0, 6),
 	})
 }
 
-func TestNewsletterService(t *testing.T){
+func TestNewsletterService(t *testing.T) {
 	Setup()
 
 	// setup mongodb session
 	session, err := mongodb.NewSession(mongodbUrl)
 	TestSession = *session
-	if err != nil{
+	if err != nil {
 		t.Fatalf("Unable to connect to mongodb: %s", err)
 	}
 	// cleanup
 	defer func() {
-		TestSession.DropDatabase(dbName)
+		// TestSession.DropDatabase(dbName)
 		TestSession.Close()
 	}()
 
@@ -84,7 +88,7 @@ func TestNewsletterService(t *testing.T){
 	t.Run("GetNewsletters", GetNewslettersShouldReturnMultipleNewslettersFromMongodb)
 }
 
-func GetNewslettersShouldReturnMultipleNewslettersFromMongodb(t *testing.T){
+func GetNewslettersShouldReturnMultipleNewslettersFromMongodb(t *testing.T) {
 	newsletterService := mongodb.NewNewsletterService(TestSession.Copy(), dbName, newsletterCollectionName)
 
 	// add two entries to database
@@ -102,14 +106,14 @@ func GetNewslettersShouldReturnMultipleNewslettersFromMongodb(t *testing.T){
 
 	// check if atleast two entries
 	count := len(newsletters)
-	if count < 2{
+	if count < 2 {
 		t.Fatalf("Incorrect number of results. Expected: '2', got: '%d'", count)
 	}
 	t.Run("GetUpcomingNewsletters", GetUpcomingNewslettersShouldReturnOnlyNewslettersWithEndDateAfterNow)
 	t.Run("DeleteNewsletterById", DeleteNewsletterShouldRemoveANewsletterFromMongodb)
 }
 
-func CreateNewsletterShouldInsertNewsletterIntoMongodb(t *testing.T){
+func CreateNewsletterShouldInsertNewsletterIntoMongodb(t *testing.T) {
 	newsletterService := mongodb.NewNewsletterService(TestSession.Copy(), dbName, newsletterCollectionName)
 
 	// store in database
@@ -118,37 +122,23 @@ func CreateNewsletterShouldInsertNewsletterIntoMongodb(t *testing.T){
 		t.Errorf("Cannot create newsletter in database: %s", err)
 	}
 
-	// Check if newsletter was created
-	var results []news.Newsletter
-	err = TestSession.GetCollection(dbName, newsletterCollectionName).Find(nil).All(&results)
-	if err != nil  {
-		t.Fatalf("Unable to get newsletters from database: '%s'", err)
-	}
-	if len(results) < 1{
-		t.Fatalf("No newsletter entires found in database. Exected: 'atleast 1', Got: '%d'", len(results))
+	// test GetNewsletterById
+	getNewsletter, err := newsletterService.GetNewsletterById(TestDummyNewsletters[0].Id.Hex())
+	if err != nil {
+		t.Fatalf("Cannot get newsletter with id: '%s", TestDummyNewsletters[0].Id)
 	}
 
-	// test GetNewsletterById
-	getNewsletter, err := newsletterService.GetNewsletterById(results[0].Id.Hex())
-	if err != nil {
-		t.Fatalf("Cannot get newsletter with id: '%s", results[0].Id)
-	}
-	count := len(results)
-	// only one entry should be found
-	if count != 1{
-		t.Errorf("Incorrect number of results. Expected: '1', got: %d", count)
-	}
 	if getNewsletter.Beschreibung != TestDummyNewsletters[0].Beschreibung &&
-		getNewsletter.Verdatum != TestDummyNewsletters[0].Verdatum{
-			t.Errorf("Result newsletter does not match created newsletter. " +
-				"Expected: '%s' and '%s', " +
-				"Got: '%s' and '%s'", TestDummyNewsletters[0].Beschreibung, TestDummyNewsletters[0].Verdatum.String(),
-				getNewsletter.Beschreibung, getNewsletter.Verdatum.String())
+		getNewsletter.Verdatum != TestDummyNewsletters[0].Verdatum {
+		t.Errorf("Result newsletter does not match created newsletter. "+
+			"Expected: '%s' and '%s', "+
+			"Got: '%s' and '%s'", TestDummyNewsletters[0].Beschreibung, TestDummyNewsletters[0].Verdatum.String(),
+			getNewsletter.Beschreibung, getNewsletter.Verdatum.String())
 	}
 	log.Print(getNewsletter.Id)
 }
 
-func DeleteNewsletterShouldRemoveANewsletterFromMongodb(t *testing.T){
+func DeleteNewsletterShouldRemoveANewsletterFromMongodb(t *testing.T) {
 	newsletterService := mongodb.NewNewsletterService(TestSession.Copy(), dbName, newsletterCollectionName)
 
 	newsletters, err := newsletterService.GetNewsletters()
@@ -174,12 +164,11 @@ func DeleteNewsletterShouldRemoveANewsletterFromMongodb(t *testing.T){
 	if err != nil {
 		t.Errorf("Cannot query for count of newsletters in database: %s", err)
 	}
-	if newCount != count - 1{
-		t.Errorf("Delete not sucessfull, to many entries remaining. Expected: '%d', Got: '%d'", count - 1, newCount)
+	if newCount != count-1 {
+		t.Errorf("Delete not sucessfull, to many entries remaining. Expected: '%d', Got: '%d'", count-1, newCount)
 	}
 }
 
-func GetUpcomingNewslettersShouldReturnOnlyNewslettersWithEndDateAfterNow(t *testing.T){
+func GetUpcomingNewslettersShouldReturnOnlyNewslettersWithEndDateAfterNow(t *testing.T) {
 
 }
-

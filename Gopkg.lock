@@ -19,8 +19,8 @@
     ".",
     "access",
     "content",
+    "cors",
     "fault",
-    "file",
     "slash"
   ]
   revision = "9dcabc145f0d565b5219e2fd72c3da04876980b7"
@@ -35,6 +35,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2bbcbb38494c16361330cb6eb291d58afa7d8942a491d1b735f5befb73bf7e10"
+  inputs-digest = "cb4ddd398dbfe0759af931ef078a2f5f7e9e3028a6d083be0f8c3c658c5f660d"
   solver-name = "gps-cdcl"
   solver-version = 1
