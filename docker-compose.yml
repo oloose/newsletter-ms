@@ -1,0 +1,48 @@
+version: "2"
+services:
+  bus:
+    build:
+      context: ./bus
+      dockerfile: bus.dockerfile
+    depends_on:
+      - mongo
+    links: 
+      - mongo
+
+  news:
+    build:
+      context: ./news
+      dockerfile: news.dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongo
+    links: 
+      - mongo
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    volumes: 
+      - database:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
+    depends_on:
+      - mongo
+    links: 
+      - mongo
+      
+volumes:
+  database: {}
