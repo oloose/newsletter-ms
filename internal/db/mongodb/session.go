@@ -10,7 +10,7 @@ type Session struct{
 
 func NewSession(mUrl string) (*Session, error){
 	// "localhost:27017 is base path to mongodb
-	session, err := mgo.Dial("localhost:27017")
+	session, err := mgo.Dial(mUrl)
 
 	if err != nil{
 		return nil, err
