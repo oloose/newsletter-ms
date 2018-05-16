@@ -8,12 +8,20 @@ import (
 	"os/signal"
 )
 
+//TODO: CLI mit urfave flags für dburl, dbname, collection name (constant values)
+//TODO: architecture docu --> alla baustein sicht, gemeinsames dach aus arbeiten (alle), teams dann eigenes; Einfach nicht sonst was großes
+//TODO: docu mit swagger, swaggerUI --> runterladen --> index files -> unter url= das .yaml angeben
+//TODO: HTTPStatusCodes zurückgeben?
+//TODO: Anleitung wie wird microservice gebastelt damit er zum schluss auch läuft
+//TODO: Crosscompile mit go
+//TODO: auf github migrieren mit repo
+//TODO: POST returnen lassen
+
 const (
 	mongodbUrl            = "127.0.0.1:27017"
 	mongodbName           = "newsletterService"
 	mongodbCollectionName = "newsletterCollection"
-	//TODO: constanten mit urfave als Flag machen
-	//EnVar
+	//TODO: constanten mit urfave als Flag machen (EnVar)
 )
 
 var mongoSession *mongodb.Session
@@ -35,6 +43,7 @@ func main() {
 	server := newsletterServer.NewServer(newsletterService)
 	server.Start()
 
+	//gracefully shutdown
 	gracefulStop := make(chan os.Signal, 1)
 	signal.Notify(gracefulStop, os.Interrupt)
 	signal.Notify(gracefulStop, os.Kill)
