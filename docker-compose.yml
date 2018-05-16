@@ -27,7 +27,7 @@ services:
       - 27017:27017
     volumes: 
       - database:/data/db
-
+    container_name: 'mongo'
   mongo-express:
     image: mongo-express
     restart: always
