@@ -1,10 +1,11 @@
+//testomate package
 package news
 
 import (
 	"time"
 	"github.com/globalsign/mgo/bson"
 )
-
+//testomate 
 type Newsletter struct{
 	Id 				     bson.ObjectId 	`json:"id" bson:"_id,omitempty"`
 	Beschreibung         string			`json:"beschreibung"`
@@ -28,7 +29,7 @@ type NewsletterParseObject struct{
 	TitelEnglisch        string
 	Verdatum             string
 }
-
+//testomate
 func(rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error){
 	newsletter := Newsletter{
 		Beschreibung: rNewsletterParseObject.Beschreibung,
