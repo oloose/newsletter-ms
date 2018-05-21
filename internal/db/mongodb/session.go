@@ -1,6 +1,8 @@
 package mongodb
 
 import (
+	"errors"
+
 	"github.com/globalsign/mgo"
 )
 
@@ -12,6 +14,7 @@ func NewSession(mUrl string) (*Session, error) {
 	session, err := mgo.Dial(mUrl)
 
 	if err != nil {
+		err = errors.New(err.Error() + "; Cannot connect to mongodb on " + mUrl)
 		return nil, err
 	}
 

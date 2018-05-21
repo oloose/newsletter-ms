@@ -1,16 +1,17 @@
 package server
 
 import (
+	"log"
+	"net/http"
+	"newsletter-service/internal/db/mongodb"
+
 	"github.com/go-ozzo/ozzo-routing"
 	"github.com/go-ozzo/ozzo-routing/access"
-	"log"
-	"github.com/go-ozzo/ozzo-routing/slash"
-	"net/http"
 	"github.com/go-ozzo/ozzo-routing/fault"
-	"newsletter-service/internal/db/mongodb"
+	"github.com/go-ozzo/ozzo-routing/slash"
 )
 
-const(
+const (
 	port = ":8080"
 )
 
@@ -32,13 +33,12 @@ func NewServer(mNewsletterService *mongodb.NewsletterService) *Server {
 	return &server
 }
 
-func(rServer *Server) NewSubrouter(mPath string) *routing.RouteGroup{
+func (rServer *Server) NewSubrouter(mPath string) *routing.RouteGroup {
 	return rServer.router.Group(mPath)
 }
 
-func(rServer *Server) Start(){
+func (rServer *Server) Start() {
 	log.Println("Listining on port :8080")
 	http.Handle("/", rServer.router)
 	http.ListenAndServe(port, nil)
 }
-

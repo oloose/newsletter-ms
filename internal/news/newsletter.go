@@ -2,23 +2,25 @@ package news
 
 import (
 	"time"
+
 	"github.com/globalsign/mgo/bson"
+	"github.com/pkg/errors"
 )
 
-type Newsletter struct{
-	Id 				     bson.ObjectId 	`json:"id" bson:"_id,omitempty"`
-	Beschreibung         string			`json:"beschreibung"`
-	BeschreibungEnglisch string 		`json:"beschreibungEnglisch"`
-	Enddatum             time.Time		`json:"enddatum"`
-	Person               string			`json:"person"`
-	Startdatum           time.Time		`json:"startdatum"`
-	Titel                string			`json:"titel"`
-	TitelEnglisch        string			`json:"titelEnglisch"`
-	Verdatum             time.Time		`json:"verdatum"`
+type Newsletter struct {
+	Id                   bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Beschreibung         string        `json:"beschreibung"`
+	BeschreibungEnglisch string        `json:"beschreibungEnglisch"`
+	Enddatum             time.Time     `json:"enddatum"`
+	Person               string        `json:"person"`
+	Startdatum           time.Time     `json:"startdatum"`
+	Titel                string        `json:"titel"`
+	TitelEnglisch        string        `json:"titelEnglisch"`
+	Verdatum             time.Time     `json:"verdatum"`
 }
 
-type NewsletterParseObject struct{
-	Id 				     string
+type NewsletterParseObject struct {
+	Id                   string
 	Beschreibung         string
 	BeschreibungEnglisch string
 	Enddatum             string
@@ -29,14 +31,14 @@ type NewsletterParseObject struct{
 	Verdatum             string
 }
 
-func(rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error){
+func (rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error) {
 	newsletter := Newsletter{
-		Beschreibung: rNewsletterParseObject.Beschreibung,
+		Beschreibung:         rNewsletterParseObject.Beschreibung,
 		BeschreibungEnglisch: rNewsletterParseObject.BeschreibungEnglisch,
 		// Enddatum: nil,
 		Person: rNewsletterParseObject.Person,
 		// Startdatum: nil,
-		Titel: rNewsletterParseObject.Titel,
+		Titel:         rNewsletterParseObject.Titel,
 		TitelEnglisch: rNewsletterParseObject.TitelEnglisch,
 		// Verdatum: nil,
 	}
@@ -50,6 +52,10 @@ func(rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error)
 	newsletter.Verdatum, err = time.ParseInLocation("02.01.06; 15:04", rNewsletterParseObject.Verdatum,
 		location)
 
+	if err != nil {
+		return &newsletter, errors.New("Wrong date format! Error while parsing date. " +
+			"Use date format: '02.01.06; 15:04' (" + err.Error() + ")")
+	}
 
-	return &newsletter, err
+	return &newsletter, nil
 }

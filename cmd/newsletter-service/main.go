@@ -5,9 +5,9 @@ import (
 	"newsletter-service/internal/db/mongodb"
 	newsletterServer "newsletter-service/internal/server"
 	"os"
-	"os/signal"
-
 	"time"
+
+	"os/signal"
 
 	"github.com/urfave/cli"
 )
@@ -15,7 +15,6 @@ import (
 //TODO: architecture docu --> alla baustein sicht, gemeinsames dach aus arbeiten (alle), teams dann eigenes; Einfach nicht sonst was großes
 //TODO: docu mit swagger, swaggerUI --> runterladen --> index files -> unter url= das .yaml angeben
 //TODO: Anleitung wie wird microservice gebastelt damit er zum schluss auch läuft
-//TODO: POST returnen lassen / HTTPStatusCodes zurückgeben?
 
 var mongoEnv *MongoEnv
 
@@ -31,22 +30,14 @@ func main() {
 	mongoEnv = &MongoEnv{}
 
 	/*
-		Setup CLI
-	*/
+	 *	Setup CLI
+	 */
 	app := cli.NewApp()
-	app.Name = "newsletterService"
+	app.Name = "Newsletter Microservice"
+	app.Usage = "Start and manage the newsletter micro service"
 	app.Version = "1.0.0"
 	app.Compiled = time.Now()
-	app.Authors = []cli.Author{
-		{
-			Name: "Oliver Loose",
-		},
-		{
-			Name: "Ricardo Zirk",
-		},
-	}
 	// define flags/parameters
-	app.Usage = "Start and manage the newsletter micro service"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "db-host, dbh",
@@ -82,6 +73,20 @@ func main() {
 		},
 	}
 
+	// gracefully shutdown
+	gracefulStop := make(chan os.Signal, 1)
+	signal.Notify(gracefulStop, os.Interrupt)
+	signal.Notify(gracefulStop, os.Kill)
+	go func() {
+		<-gracefulStop
+
+		if mongoEnv.session != nil {
+			mongoEnv.session.Close()
+		}
+
+		os.Exit(0)
+	}()
+
 	// run cli
 	err := app.Run(os.Args)
 	if err != nil {
@@ -113,20 +118,6 @@ func StartNewsletterServer(c *cli.Context) error {
 	// setup server
 	server := newsletterServer.NewServer(newsletterService)
 	server.Start()
-
-	// gracefully shutdown
-	gracefulStop := make(chan os.Signal, 1)
-	signal.Notify(gracefulStop, os.Interrupt)
-	signal.Notify(gracefulStop, os.Kill)
-	go func() {
-		<-gracefulStop
-
-		if mongoEnv.session != nil {
-			mongoEnv.session.Close()
-		}
-
-		os.Exit(0)
-	}()
 
 	return err
 }
