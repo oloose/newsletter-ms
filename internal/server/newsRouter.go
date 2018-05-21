@@ -25,9 +25,8 @@ func NewNewsRouter(mNewsletterService *mongodb.NewsletterService, mRouter *routi
 	mRouter.Get("/newsletters", newsRouter.GetNewsletters, fault.Recovery(log.Printf))
 	mRouter.Get(`/newsletter/<id>`, newsRouter.GetNewsletterById, fault.Recovery(log.Printf),
 		fault.ErrorHandler(log.Printf)).Delete(newsRouter.DeleteNewsletterById, fault.Recovery(log.Printf))
-	mRouter.Post("/newsletter", newsRouter.PostNewsletter, fault.Recovery(log.Printf))
-	// .Put(
-	// 	newsRouter.PutNewsletter)
+	mRouter.Post("/newsletter", newsRouter.PostNewsletter, fault.Recovery(log.Printf)).Put(
+		newsRouter.PutNewsletter)
 	mRouter.Get("/newsletters/upcoming", newsRouter.GetUpcomingNewsletters, fault.Recovery(log.Printf))
 
 	return mRouter
@@ -70,7 +69,7 @@ func (rNewsRouter *NewsRouter) PostNewsletter(mContext *routing.Context) error {
 	var newsletterParseObject news.NewsletterParseObject
 	err := mContext.Read(&newsletterParseObject)
 	if err != nil {
-		return routing.NewHTTPError(500, "Invalid input. (ERROR: "+err.Error()+")")
+		return routing.NewHTTPError(500, "(ERROR: "+err.Error()+")")
 	}
 
 	// parse to newsletter
@@ -87,9 +86,29 @@ func (rNewsRouter *NewsRouter) PostNewsletter(mContext *routing.Context) error {
 	return nil
 }
 
-// func (rNewsRouter *NewsRouter) PutNewsletter(mContext *routing.Context) error {
-//
-// }
+func (rNewsRouter *NewsRouter) PutNewsletter(mContext *routing.Context) error {
+	var newsletterParseObject news.NewsletterParseObject
+	err := mContext.Read(&newsletterParseObject)
+	if err != nil {
+		return routing.NewHTTPError(500, "(ERROR: "+err.Error()+")")
+	}
+
+	// parse to newsletter
+	newNewsletter, err := newsletterParseObject.Parse()
+	if err != nil {
+		return routing.NewHTTPError(400, "Invalid input. (ERROR: "+err.Error()+")")
+	}
+
+	// store in db
+	if _, err := rNewsRouter.newsletterService.UpdateNewsletter(newNewsletter); err != nil {
+		if err.Error() == "not found" {
+			return routing.NewHTTPError(404, "Newsletter not found.(ERROR: "+err.Error()+")")
+		}
+		return err
+	}
+
+	return nil
+}
 
 func (rNewsRouter *NewsRouter) DeleteNewsletterById(mContext *routing.Context) error {
 	id := mContext.Param("id")

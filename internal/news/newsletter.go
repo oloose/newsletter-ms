@@ -32,6 +32,7 @@ type NewsletterParseObject struct {
 }
 
 func (rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error) {
+	// copy possible values in newsletter object
 	newsletter := Newsletter{
 		Beschreibung:         rNewsletterParseObject.Beschreibung,
 		BeschreibungEnglisch: rNewsletterParseObject.BeschreibungEnglisch,
@@ -51,6 +52,11 @@ func (rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error
 		location)
 	newsletter.Verdatum, err = time.ParseInLocation("02.01.06; 15:04", rNewsletterParseObject.Verdatum,
 		location)
+
+	// check for existing id
+	if rNewsletterParseObject.Id != "" {
+		newsletter.Id = bson.ObjectIdHex(rNewsletterParseObject.Id)
+	}
 
 	if err != nil {
 		return &newsletter, errors.New("Wrong date format! Error while parsing date. " +
