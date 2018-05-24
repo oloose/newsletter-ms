@@ -42,13 +42,12 @@ func (rNewsletterService *NewsletterService) GetNewsletters() ([]news.Newsletter
 
 func (rNewsletterService *NewsletterService) GetNewsletterById(mId string) (*news.Newsletter, error) {
 	newsletter := news.Newsletter{}
-	err := rNewsletterService.collection.Find(bson.M{"_id": bson.ObjectIdHex(mId)}).One(&newsletter)
+	err := rNewsletterService.collection.FindId(mId).All(&newsletter)
 	return &newsletter, err
 }
 
 func (rNewsletterService *NewsletterService) DeleteNewsletterById(mId string) error {
-	err := rNewsletterService.collection.Remove(bson.M{"_id": bson.ObjectIdHex(mId)})
-	return err
+	return rNewsletterService.collection.Remove(bson.M{"_id": bson.ObjectIdHex(mId)})
 }
 
 func (rNewsletterService *NewsletterService) GetUpcomingNewsletters() ([]news.Newsletter, error) {

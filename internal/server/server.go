@@ -8,6 +8,7 @@ import (
 	"github.com/go-ozzo/ozzo-routing"
 	"github.com/go-ozzo/ozzo-routing/access"
 	"github.com/go-ozzo/ozzo-routing/fault"
+	"github.com/go-ozzo/ozzo-routing/file"
 	"github.com/go-ozzo/ozzo-routing/slash"
 )
 
@@ -26,6 +27,11 @@ func NewServer(mNewsletterService *mongodb.NewsletterService) *Server {
 		slash.Remover(http.StatusMovedPermanently),
 		fault.Recovery(log.Printf),
 	)
+
+	// serve swagger-ui
+	server.router.Get("/swagger/*", file.Server(file.PathMap{
+		"/swagger/": "/swagger-ui/dist/",
+	}))
 
 	// add sup routes
 	NewNewsRouter(mNewsletterService, server.NewSubrouter("/news"))

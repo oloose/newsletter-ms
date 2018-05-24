@@ -14,7 +14,7 @@ import (
 
 //TODO: architecture docu --> alla baustein sicht, gemeinsames dach aus arbeiten (alle), teams dann eigenes; Einfach nicht sonst was großes
 //TODO: docu mit swagger, swaggerUI --> runterladen --> index files -> unter url= das .yaml angeben
-//TODO: Anleitung wie wird microservice gebastelt damit er zum schluss auch läuft
+//TODO: add Dockerfile-> start server from src/newsletter-service
 
 var mongoEnv *MongoEnv
 
