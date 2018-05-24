@@ -1,4 +1,6 @@
-package mongodb_test
+// Package containing mongodb related functions for testing (OUTDATED). Not everything possible is tested because this
+// is just an example of how tests in golang could be done.
+package mongodb
 
 import (
 	"log"
@@ -109,7 +111,6 @@ func GetNewslettersShouldReturnMultipleNewslettersFromMongodb(t *testing.T) {
 	if count < 2 {
 		t.Fatalf("Incorrect number of results. Expected: '2', got: '%d'", count)
 	}
-	t.Run("GetUpcomingNewsletters", GetUpcomingNewslettersShouldReturnOnlyNewslettersWithEndDateAfterNow)
 	t.Run("DeleteNewsletterById", DeleteNewsletterShouldRemoveANewsletterFromMongodb)
 }
 
@@ -167,8 +168,4 @@ func DeleteNewsletterShouldRemoveANewsletterFromMongodb(t *testing.T) {
 	if newCount != count-1 {
 		t.Errorf("Delete not sucessfull, to many entries remaining. Expected: '%d', Got: '%d'", count-1, newCount)
 	}
-}
-
-func GetUpcomingNewslettersShouldReturnOnlyNewslettersWithEndDateAfterNow(t *testing.T) {
-
 }

@@ -11,25 +11,32 @@ import (
 	"github.com/go-ozzo/ozzo-routing/fault"
 )
 
+// Defines a NewsRouter type containing a NewsletterService to handle mongodb access.
 type NewsRouter struct {
 	newsletterService mongodb.NewsletterService
 }
 
-func NewNewsRouter(mNewsletterService *mongodb.NewsletterService, mRouter *routing.RouteGroup) *routing.RouteGroup {
+// Returns a NewsRouter as child route group of the base server (mServer) Router, that uses the given NewsletterService
+// to handle mongodb access. Defines the REST-API routes that can be accessed.
+func NewNewsRouter(mNewsletterService *mongodb.NewsletterService, mServer *Server) *routing.RouteGroup {
 	newsRouter := NewsRouter{*mNewsletterService}
+	// new sup router with /news/*
+	newsSupRoute := mServer.NewSubrouter("/news")
 
-	mRouter.Use(
+	// routes only accept and return json data
+	newsSupRoute.Use(
 		content.TypeNegotiator(content.JSON),
 	)
 
-	mRouter.Get("/newsletters", newsRouter.GetNewsletters, fault.Recovery(log.Printf))
-	mRouter.Get(`/newsletter/<id>`, newsRouter.GetNewsletterById, fault.Recovery(log.Printf)).Delete(
+	// define REST routes
+	newsSupRoute.Get("/newsletters", newsRouter.GetNewsletters, fault.Recovery(log.Printf))
+	newsSupRoute.Get(`/newsletter/<id>`, newsRouter.GetNewsletterById, fault.Recovery(log.Printf)).Delete(
 		newsRouter.DeleteNewsletterById, fault.Recovery(log.Printf))
-	mRouter.Post("/newsletter", newsRouter.PostNewsletter, fault.Recovery(log.Printf)).Put(
+	newsSupRoute.Post("/newsletter", newsRouter.PostNewsletter, fault.Recovery(log.Printf)).Put(
 		newsRouter.PutNewsletter)
-	mRouter.Get("/newsletters/upcoming", newsRouter.GetUpcomingNewsletters, fault.Recovery(log.Printf))
+	newsSupRoute.Get("/newsletters/upcoming", newsRouter.GetUpcomingNewsletters, fault.Recovery(log.Printf))
 
-	return mRouter
+	return newsSupRoute
 }
 
 func (rNewsRouter *NewsRouter) GetNewsletters(mContext *routing.Context) error {

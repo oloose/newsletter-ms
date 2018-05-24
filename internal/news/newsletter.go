@@ -1,3 +1,4 @@
+// Package defining a Newsletter type and related functions.
 package news
 
 import (
@@ -7,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Defines a newsletter.
 type Newsletter struct {
 	Id                   bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Beschreibung         string        `json:"beschreibung"`
@@ -19,6 +21,10 @@ type Newsletter struct {
 	Verdatum             time.Time     `json:"verdatum"`
 }
 
+// Used as a placeholder while getting a Newsletter entry from the database, this object will latter parsed to a real
+// Newsletter type object. This is necessary because all values in the returned newsletter entry from the database are
+// strings (json) but Newsletter type contains time.Time attributes, so a direct conversion might throw an error.
+// TODO: There might be a better approach to handle conversion we do not know yet.
 type NewsletterParseObject struct {
 	Id                   string
 	Beschreibung         string
@@ -31,6 +37,7 @@ type NewsletterParseObject struct {
 	Verdatum             string
 }
 
+// Parses all values from a referenced NewsletterParseObject into a newsletter type object and returns the newsletter.
 func (rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error) {
 	// copy possible values in newsletter object
 	newsletter := Newsletter{
@@ -53,14 +60,14 @@ func (rNewsletterParseObject *NewsletterParseObject) Parse() (*Newsletter, error
 	newsletter.Verdatum, err = time.ParseInLocation("02.01.06; 15:04", rNewsletterParseObject.Verdatum,
 		location)
 
-	// check for existing id
-	if rNewsletterParseObject.Id != "" {
-		newsletter.Id = bson.ObjectIdHex(rNewsletterParseObject.Id)
-	}
-
 	if err != nil {
 		return &newsletter, errors.New("Wrong date format! Error while parsing date. " +
 			"Use date format: '02.01.06; 15:04' (" + err.Error() + ")")
+	}
+
+	// check for existing id
+	if rNewsletterParseObject.Id != "" {
+		newsletter.Id = bson.ObjectIdHex(rNewsletterParseObject.Id)
 	}
 
 	return &newsletter, nil

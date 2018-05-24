@@ -34,7 +34,7 @@ func NewServer(mNewsletterService *mongodb.NewsletterService) *Server {
 	}))
 
 	// add sup routes
-	NewNewsRouter(mNewsletterService, server.NewSubrouter("/news"))
+	NewNewsRouter(mNewsletterService, &server)
 
 	return &server
 }

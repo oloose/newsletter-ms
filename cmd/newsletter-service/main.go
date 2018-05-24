@@ -13,11 +13,11 @@ import (
 )
 
 //TODO: architecture docu --> alla baustein sicht, gemeinsames dach aus arbeiten (alle), teams dann eigenes; Einfach nicht sonst was großes
-//TODO: docu mit swagger, swaggerUI --> runterladen --> index files -> unter url= das .yaml angeben
 //TODO: add Dockerfile-> start server from src/newsletter-service
 
 var mongoEnv *MongoEnv
 
+// MongoDB environment variables
 type MongoEnv struct {
 	session      *mongodb.Session
 	host         string
@@ -94,13 +94,14 @@ func main() {
 	}
 }
 
+// Starts the newsletter service.
+// Establishes a connection to mongo db, creates a service to coordinate database excess and starts the service.
 func StartNewsletterServer(c *cli.Context) error {
 	var err error
 
 	// establish connection/session to mongodb
 	log.Printf("Trying to connect to mongodb on '%s' with database '%s' and collection '%s'",
 		mongoEnv.host+mongoEnv.port, mongoEnv.dbCollection, mongoEnv.dbCollection)
-
 	mongoEnv.session, err = mongodb.NewSession(mongoEnv.host + mongoEnv.port)
 	if err != nil {
 		log.Fatalf("Unable to connect to mongodb: '%s'", err)
