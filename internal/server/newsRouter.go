@@ -23,8 +23,8 @@ func NewNewsRouter(mNewsletterService *mongodb.NewsletterService, mRouter *routi
 	)
 
 	mRouter.Get("/newsletters", newsRouter.GetNewsletters, fault.Recovery(log.Printf))
-	mRouter.Get(`/newsletter/<id>`, newsRouter.GetNewsletterById, fault.Recovery(log.Printf),
-		fault.ErrorHandler(log.Printf)).Delete(newsRouter.DeleteNewsletterById, fault.Recovery(log.Printf))
+	mRouter.Get(`/newsletter/<id>`, newsRouter.GetNewsletterById, fault.Recovery(log.Printf)).Delete(
+		newsRouter.DeleteNewsletterById, fault.Recovery(log.Printf))
 	mRouter.Post("/newsletter", newsRouter.PostNewsletter, fault.Recovery(log.Printf)).Put(
 		newsRouter.PutNewsletter)
 	mRouter.Get("/newsletters/upcoming", newsRouter.GetUpcomingNewsletters, fault.Recovery(log.Printf))
@@ -37,7 +37,7 @@ func (rNewsRouter *NewsRouter) GetNewsletters(mContext *routing.Context) error {
 	newsletters, err := rNewsRouter.newsletterService.GetNewsletters()
 
 	if err != nil {
-		return err
+		return routing.NewHTTPError(500, err.Error())
 	}
 
 	mContext.Write(&newsletters)
@@ -57,7 +57,7 @@ func (rNewsRouter *NewsRouter) GetNewsletterById(mContext *routing.Context) erro
 		if err.Error() == "not found" {
 			return routing.NewHTTPError(404, "Newsletter not found.(ERROR: "+err.Error()+")")
 		}
-		return err
+		return routing.NewHTTPError(500, err.Error())
 	}
 
 	mContext.Write(newsletter)
@@ -73,6 +73,7 @@ func (rNewsRouter *NewsRouter) PostNewsletter(mContext *routing.Context) error {
 	}
 
 	// parse to newsletter
+	newsletterParseObject.Id = "" // post should create a new entry, so set id nil
 	newNewsletter, err := newsletterParseObject.Parse()
 	if err != nil {
 		return routing.NewHTTPError(400, "Invalid input. (ERROR: "+err.Error()+")")
@@ -80,7 +81,7 @@ func (rNewsRouter *NewsRouter) PostNewsletter(mContext *routing.Context) error {
 
 	// store in db
 	if err := rNewsRouter.newsletterService.CreateNewsletter(newNewsletter); err != nil {
-		return err
+		return routing.NewHTTPError(500, err.Error())
 	}
 
 	return nil
@@ -104,7 +105,7 @@ func (rNewsRouter *NewsRouter) PutNewsletter(mContext *routing.Context) error {
 		if err.Error() == "not found" {
 			return routing.NewHTTPError(404, "Newsletter not found.(ERROR: "+err.Error()+")")
 		}
-		return err
+		return routing.NewHTTPError(500, err.Error())
 	}
 
 	return nil
@@ -118,7 +119,7 @@ func (rNewsRouter *NewsRouter) DeleteNewsletterById(mContext *routing.Context) e
 		if err.Error() == "not found" {
 			return routing.NewHTTPError(404, "Newsletter not found.(ERROR: "+err.Error()+")")
 		}
-		return err
+		return routing.NewHTTPError(500, err.Error())
 	}
 
 	return nil
@@ -129,7 +130,7 @@ func (rNewsRouter *NewsRouter) GetUpcomingNewsletters(mContext *routing.Context)
 	newsletters, err := rNewsRouter.newsletterService.GetUpcomingNewsletters()
 
 	if err != nil {
-		return err
+		return routing.NewHTTPError(500, err.Error())
 	}
 
 	mContext.Write(newsletters)

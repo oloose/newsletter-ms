@@ -19,8 +19,8 @@
     ".",
     "access",
     "content",
-    "cors",
     "fault",
+    "file",
     "slash"
   ]
   revision = "9dcabc145f0d565b5219e2fd72c3da04876980b7"
@@ -32,9 +32,21 @@
   packages = ["httputil/header"]
   revision = "416d5fc8c9c85e9ec9252a70d01e069f4b287ff0"
 
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/urfave/cli"
+  packages = ["."]
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cb4ddd398dbfe0759af931ef078a2f5f7e9e3028a6d083be0f8c3c658c5f660d"
+  inputs-digest = "4c2cc5b0d8326d4410d571f2bfaa637a683875519e548128235e6ab930242747"
   solver-name = "gps-cdcl"
   solver-version = 1
