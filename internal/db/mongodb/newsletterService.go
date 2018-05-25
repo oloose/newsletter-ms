@@ -55,10 +55,10 @@ func (rNewsletterService *NewsletterService) GetNewsletters() ([]news.Newsletter
 
 // Returns the newsletter with the given id (mId).
 func (rNewsletterService *NewsletterService) GetNewsletterById(mId string) (*news.Newsletter, error) {
-	newsletter := news.Newsletter{}
+	var newsletter []news.Newsletter
 	// try to find the newsletter based on mId and return it
-	err := rNewsletterService.collection.FindId(mId).All(&newsletter)
-	return &newsletter, err
+	err := rNewsletterService.collection.FindId(bson.ObjectIdHex(mId)).All(&newsletter)
+	return &newsletter[0], err
 }
 
 // Deletes a newsletter with the give id (mId).

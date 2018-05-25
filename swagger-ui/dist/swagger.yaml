@@ -120,7 +120,7 @@ paths:
           description: "Successfull"
         404:
           description: "Newsletter not found"
-  /news/newsletter/upcoming:
+  /news/newsletters/upcoming:
     get:
       tags:
       - "news"
