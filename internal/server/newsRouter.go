@@ -39,6 +39,7 @@ func NewNewsRouter(mNewsletterService *mongodb.NewsletterService, mServer *Serve
 	return newsSupRoute
 }
 
+// Returns all newsletter in the mongodb collection
 func (rNewsRouter *NewsRouter) GetNewsletters(mContext *routing.Context) error {
 	// get newsletters from db
 	newsletters, err := rNewsRouter.newsletterService.GetNewsletters()
@@ -56,6 +57,7 @@ func (rNewsRouter *NewsRouter) GetNewsletters(mContext *routing.Context) error {
 	return nil
 }
 
+// Returns a single newsletter with a given id (mId) if a newsletter with the id exists in the database
 func (rNewsRouter *NewsRouter) GetNewsletterById(mContext *routing.Context) error {
 	id := mContext.Param("id")
 	// get from db
@@ -72,7 +74,10 @@ func (rNewsRouter *NewsRouter) GetNewsletterById(mContext *routing.Context) erro
 	return nil
 }
 
+// Receives/Reads values for a newsletter type object, creates a new newsletter object and stores it in the database.
 func (rNewsRouter *NewsRouter) PostNewsletter(mContext *routing.Context) error {
+	// get newsletter values and use placeholder newsletter object at first, that can
+	// later be parsed to a real newsletter
 	var newsletterParseObject news.NewsletterParseObject
 	err := mContext.Read(&newsletterParseObject)
 	if err != nil {
@@ -94,21 +99,17 @@ func (rNewsRouter *NewsRouter) PostNewsletter(mContext *routing.Context) error {
 	return nil
 }
 
+// Receives/Reads values of a newsletter (of an existing newsletter) and uses its id to update the database entry.
 func (rNewsRouter *NewsRouter) PutNewsletter(mContext *routing.Context) error {
-	var newsletterParseObject news.NewsletterParseObject
-	err := mContext.Read(&newsletterParseObject)
+	// Get newsletter values
+	var newsletter *news.Newsletter
+	err := mContext.Read(&newsletter)
 	if err != nil {
 		return routing.NewHTTPError(500, "(ERROR: "+err.Error()+")")
 	}
 
-	// parse to newsletter
-	newNewsletter, err := newsletterParseObject.Parse()
-	if err != nil {
-		return routing.NewHTTPError(400, "Invalid input. (ERROR: "+err.Error()+")")
-	}
-
 	// store in db
-	if _, err := rNewsRouter.newsletterService.UpdateNewsletter(newNewsletter); err != nil {
+	if _, err := rNewsRouter.newsletterService.UpdateNewsletter(newsletter); err != nil {
 		if err.Error() == "not found" {
 			return routing.NewHTTPError(404, "Newsletter not found.(ERROR: "+err.Error()+")")
 		}
@@ -118,6 +119,7 @@ func (rNewsRouter *NewsRouter) PutNewsletter(mContext *routing.Context) error {
 	return nil
 }
 
+// Deletes a newsletter in database, based on the given id parameter of the url.
 func (rNewsRouter *NewsRouter) DeleteNewsletterById(mContext *routing.Context) error {
 	id := mContext.Param("id")
 	// delete from db
@@ -132,6 +134,7 @@ func (rNewsRouter *NewsRouter) DeleteNewsletterById(mContext *routing.Context) e
 	return nil
 }
 
+// Returns a list of all upcoming newsletters (enddatum value is in the future).
 func (rNewsRouter *NewsRouter) GetUpcomingNewsletters(mContext *routing.Context) error {
 	// get upcoming (end date after now) newsletters from db
 	newsletters, err := rNewsRouter.newsletterService.GetUpcomingNewsletters()
@@ -140,11 +143,12 @@ func (rNewsRouter *NewsRouter) GetUpcomingNewsletters(mContext *routing.Context)
 		return routing.NewHTTPError(500, err.Error())
 	}
 
-	mContext.Write(newsletters)
 	// check if list of newsletters is empty
 	if len(newsletters) == 0 {
 		return routing.NewHTTPError(204, "Result is empty. No newsletters available.")
 	}
+
+	mContext.Write(&newsletters)
 
 	return nil
 }
