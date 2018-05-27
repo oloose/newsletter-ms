@@ -9,10 +9,10 @@ import (
 
 	"github.com/urfave/cli"
 	"github.com/oloose/newsletter-ms/internal/db/mongodb"
+	newsletterServer "github.com/oloose/newsletter-ms/internal/server"
 )
 
 //TODO: architecture docu --> alla baustein sicht, gemeinsames dach aus arbeiten (alle), teams dann eigenes; Einfach nicht sonst was großes
-//TODO: add Dockerfile-> start server from src/newsletter-service
 
 var mongoEnv *MongoEnv
 
@@ -108,7 +108,7 @@ func StartNewsletterServer(c *cli.Context) error {
 		log.Print("Connected to database")
 	}
 
-	// close session on newsletter-service shutdown
+	// close session on newsletter-ms shutdown
 	defer mongoEnv.session.Close()
 
 	// setup newsletter service for database transactions
@@ -116,7 +116,7 @@ func StartNewsletterServer(c *cli.Context) error {
 		mongoEnv.dbCollection)
 
 	// setup server
-	var newsletterService mongodb.NewsletterService
+
 	server := newsletterServer.NewServer(newsletterService)
 	server.Start()
 
