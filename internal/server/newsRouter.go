@@ -1,8 +1,8 @@
 package server
 
 import (
-	"newsletter-service/internal/db/mongodb"
-	"newsletter-service/internal/news"
+	"github.com/oloose/newsletter-ms/internal/db/mongodb"
+	"github.com/oloose/newsletter-ms/internal/news"
 
 	"log"
 

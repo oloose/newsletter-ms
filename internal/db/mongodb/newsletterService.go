@@ -2,11 +2,11 @@
 package mongodb
 
 import (
-	"newsletter-service/internal/news"
 	"time"
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
+	"github.com/oloose/newsletter-ms/internal/news"
 )
 
 // Defines the negotiator for mongodb access which will be used as referencer type for functions that access/manipulate

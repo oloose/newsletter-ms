@@ -2,14 +2,13 @@ package main
 
 import (
 	"log"
-	"newsletter-service/internal/db/mongodb"
-	newsletterServer "newsletter-service/internal/server"
 	"os"
 	"time"
 
 	"os/signal"
 
 	"github.com/urfave/cli"
+	"github.com/oloose/newsletter-ms/internal/db/mongodb"
 )
 
 //TODO: architecture docu --> alla baustein sicht, gemeinsames dach aus arbeiten (alle), teams dann eigenes; Einfach nicht sonst was großes
@@ -117,6 +116,7 @@ func StartNewsletterServer(c *cli.Context) error {
 		mongoEnv.dbCollection)
 
 	// setup server
+	var newsletterService mongodb.NewsletterService
 	server := newsletterServer.NewServer(newsletterService)
 	server.Start()
 

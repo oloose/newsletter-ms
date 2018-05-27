@@ -3,7 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
-	"newsletter-service/internal/db/mongodb"
+	"github.com/oloose/newsletter-ms/internal/db/mongodb"
 
 	"github.com/go-ozzo/ozzo-routing"
 	"github.com/go-ozzo/ozzo-routing/access"

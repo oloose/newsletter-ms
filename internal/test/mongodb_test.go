@@ -4,8 +4,8 @@ package mongodb
 
 import (
 	"log"
-	"newsletter-service/internal/db/mongodb"
-	"newsletter-service/internal/news"
+	"github.com/oloose/newsletter-ms/internal/db/mongodb"
+	"github.com/oloose/newsletter-ms/internal/news"
 	"testing"
 	"time"
 
