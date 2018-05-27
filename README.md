@@ -6,7 +6,8 @@ Einfacher Microservice mit Golang, der im Rahmen des Informatik Masterstudiengan
 2. MongoDB installieren (https://docs.mongodb.com/manual/installation/)
 3. go get github.com/oloose/newsletter-ms/... (Download unter $GOPATH und Installation des Microservices)
 4. Wechsel in $GOPATH/src/github.com/oloose/newsletter-ms
-5. newsletter-ms start (Startet den Newsletter-Microservice)(*newsletter-ms* gibt Hilfe aus)
+5. MongoDB starten
+6. newsletter-ms start (Startet den Newsletter-Microservice)(*newsletter-ms* gibt Hilfe aus)
 
 #### Docker
 Die Docker-Konfiguration ist zu finden unter: https://github.com/rzirk/docker-ms
