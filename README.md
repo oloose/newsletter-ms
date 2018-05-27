@@ -1,4 +1,4 @@
-# Newsletter Service
+# Newsletter Microservice
 Einfacher Microservice mit Golang, der im Rahmen des Informatik Masterstudienganges im Kurs *Softwarearchitektur* an der *Hochschule Stralsund* entwickelt wurde.
 
 #### Installation
