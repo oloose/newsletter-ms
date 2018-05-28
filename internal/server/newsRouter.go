@@ -48,12 +48,13 @@ func (rNewsRouter *NewsRouter) GetNewsletters(mContext *routing.Context) error {
 		return routing.NewHTTPError(500, err.Error())
 	}
 
-	mContext.Write(&newsletters)
-
 	// check if list of newsletters is empty
 	if len(newsletters) == 0 {
 		return routing.NewHTTPError(204, "Result is empty. No newsletters available.")
 	}
+
+	mContext.Write(&newsletters)
+
 	return nil
 }
 
