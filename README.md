@@ -11,4 +11,4 @@ Einfacher Microservice mit Golang, der im Rahmen des Informatik Masterstudiengan
 7. Swagger-API Dokumentation aufrufen in Browser z.B.: localhost:8080/swagger/index.html
 
 #### Docker
-Die Docker-Konfiguration ist zu finden unter: https://github.com/rzirk/docker-ms
+Die Docker-Konfiguration ist zu finden unter: https://github.com/rzirk/sa18-docker
